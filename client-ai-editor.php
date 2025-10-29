@@ -1,0 +1,270 @@
+<?php
+/**
+ * Plugin Name: Client AI Block Editor
+ * Plugin URI: https://example.com
+ * Description: AI Block Editor v2 - React + AI SDK streaming chat for ACF flexible content
+ * Version: 2.0.0
+ * Author: Your Name
+ * Author URI: https://example.com
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: client-ai-editor
+ * Requires at least: 6.0
+ * Requires PHP: 7.4
+ */
+
+// Exit if accessed directly
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Define plugin constants
+define('CAE_VERSION', '2.0.0');
+define('CAE_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('CAE_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('CAE_PLUGIN_BASENAME', plugin_basename(__FILE__));
+
+/**
+ * Main plugin class
+ */
+class Client_AI_Editor {
+    
+    /**
+     * Instance of this class
+     */
+    private static $instance = null;
+    
+    /**
+     * Get instance
+     */
+    public static function get_instance() {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    /**
+     * Constructor
+     */
+    private function __construct() {
+        $this->load_dependencies();
+        $this->init_hooks();
+    }
+    
+    /**
+     * Load required files
+     */
+    private function load_dependencies() {
+        require_once CAE_PLUGIN_DIR . 'includes/settings.php';
+        require_once CAE_PLUGIN_DIR . 'includes/api.php';
+        require_once CAE_PLUGIN_DIR . 'includes/block-detector.php';
+        require_once CAE_PLUGIN_DIR . 'includes/streaming-api.php';
+    }
+    
+    /**
+     * Initialize WordPress hooks
+     */
+    private function init_hooks() {
+        // Activation/deactivation hooks
+        register_activation_hook(__FILE__, [$this, 'activate']);
+        register_deactivation_hook(__FILE__, [$this, 'deactivate']);
+        
+        // Enqueue assets
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_assets']);
+        
+        // AJAX endpoints
+        add_action('wp_ajax_cae_get_block', 'cae_ajax_get_block');
+        add_action('wp_ajax_cae_get_page_blocks', 'cae_ajax_get_page_blocks');
+        add_action('wp_ajax_cae_process', 'cae_ajax_process');
+        add_action('wp_ajax_cae_apply', 'cae_ajax_apply');
+        add_action('wp_ajax_cae_streaming_chat', 'cae_ajax_streaming_chat');
+        
+        // Add chat widget to admin and frontend
+        add_action('admin_footer', [$this, 'render_chat_widget']);
+        add_action('wp_footer', [$this, 'render_chat_widget']);
+    }
+    
+    /**
+     * Plugin activation
+     */
+    public function activate() {
+        // Set default options
+        if (!get_option('cae_settings')) {
+            add_option('cae_settings', [
+                'api_key' => '',
+                'model' => 'gpt-5',
+                'frontend_enabled' => true,
+            ]);
+        }
+    }
+    
+    /**
+     * Plugin deactivation
+     */
+    public function deactivate() {
+        // Cleanup if needed
+    }
+    
+    /**
+     * Enqueue admin assets
+     */
+    public function enqueue_admin_assets($hook) {
+        // Only load on post edit screens
+        if (!in_array($hook, ['post.php', 'post-new.php'])) {
+            return;
+        }
+        
+        // Check if user has permission
+        if (!current_user_can('edit_posts')) {
+            return;
+        }
+        
+        $this->enqueue_common_assets();
+        
+        // Admin-specific: ACF integration for AI edit buttons
+        wp_enqueue_script(
+            'cae-acf-integration',
+            CAE_PLUGIN_URL . 'assets/acf-integration.js',
+            ['jquery'],
+            CAE_VERSION,
+            true
+        );
+        
+        wp_enqueue_style(
+            'cae-acf-integration',
+            CAE_PLUGIN_URL . 'assets/acf-integration.css',
+            [],
+            CAE_VERSION
+        );
+    }
+    
+    /**
+     * Enqueue frontend assets
+     */
+    public function enqueue_frontend_assets() {
+        // Check if frontend editing is enabled
+        $settings = get_option('cae_settings', []);
+        if (empty($settings['frontend_enabled'])) {
+            return;
+        }
+        
+        // Only load for logged-in users with edit capability
+        if (!current_user_can('edit_posts')) {
+            return;
+        }
+        
+        $this->enqueue_common_assets();
+        
+        // Frontend-specific data already in CAE_Data via enqueue_common_assets
+    }
+    
+    /**
+     * Enqueue common assets (both admin and frontend)
+     */
+    private function enqueue_common_assets() {
+        // Check if build exists
+        $asset_file = CAE_PLUGIN_DIR . 'build/index.asset.php';
+        
+        if (!file_exists($asset_file)) {
+            error_log('CAE: React build not found. Run: npm run build');
+            return;
+        }
+        
+        // Load asset file (generated by wp-scripts)
+        $asset = include $asset_file;
+        
+        // Enqueue React app JS
+        wp_enqueue_script(
+            'cae-app',
+            CAE_PLUGIN_URL . 'build/index.js',
+            $asset['dependencies'], // Auto-includes React, wp-element
+            $asset['version'],
+            true
+        );
+        
+        // Enqueue React app CSS
+        if (file_exists(CAE_PLUGIN_DIR . 'build/style-index.css')) {
+            wp_enqueue_style(
+                'cae-app',
+                CAE_PLUGIN_URL . 'build/style-index.css',
+                [],
+                $asset['version']
+            );
+        } elseif (file_exists(CAE_PLUGIN_DIR . 'build/index.css')) {
+            wp_enqueue_style(
+                'cae-app',
+                CAE_PLUGIN_URL . 'build/index.css',
+                [],
+                $asset['version']
+            );
+        }
+        
+        // Detect WPML language if active
+        $current_language = null;
+        $language_name = null;
+        
+        if (function_exists('wpml_get_current_language')) {
+            $current_language = apply_filters('wpml_current_language', null);
+            
+            // Get human-readable language name
+            if ($current_language && function_exists('wpml_get_language_information')) {
+                $lang_info = apply_filters('wpml_language_information', null, $current_language);
+                $language_name = isset($lang_info['display_name']) ? $lang_info['display_name'] : $current_language;
+            }
+        }
+        
+        // Localize script with data for React
+        wp_localize_script('cae-app', 'CAE_Data', [
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('cae-nonce'),
+            'postId' => get_the_ID(),
+            'mode' => is_admin() ? 'admin' : 'frontend',
+            'language' => $current_language,
+            'languageName' => $language_name,
+        ]);
+    }
+    
+    /**
+     * Render chat widget HTML
+     * Note: React app mounts itself, we don't need to render HTML template
+     */
+    public function render_chat_widget() {
+        // Check permissions
+        if (!current_user_can('edit_posts')) {
+            return;
+        }
+        
+        // Check if on admin or frontend
+        $is_admin = is_admin();
+        
+        // For frontend, check if enabled
+        if (!$is_admin) {
+            $settings = get_option('cae_settings', []);
+            if (empty($settings['frontend_enabled'])) {
+                return;
+            }
+        }
+        
+        // Only render on post edit screens in admin
+        if ($is_admin) {
+            $screen = get_current_screen();
+            if (!$screen || !in_array($screen->base, ['post'])) {
+                return;
+            }
+        }
+        
+        // React app will mount itself via src/index.js
+        // No need to render HTML template
+    }
+}
+
+// Initialize the plugin
+function cae_init() {
+    return Client_AI_Editor::get_instance();
+}
+
+// Start the plugin
+add_action('plugins_loaded', 'cae_init');
+

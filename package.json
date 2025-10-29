@@ -1,0 +1,21 @@
+{
+  "name": "client-ai-editor",
+  "version": "2.0.0",
+  "description": "AI Block Editor v2 - WordPress plugin with Vercel AI SDK streaming chat for ACF flexible content",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "format": "wp-scripts format",
+    "lint:js": "wp-scripts lint-js"
+  },
+  "keywords": ["wordpress", "ai", "acf", "openai", "claude", "chat"],
+  "author": "",
+  "license": "GPL-2.0-or-later",
+  "dependencies": {
+    "ai": "^3.4.33"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^30.27.0"
+  }
+}

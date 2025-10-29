@@ -1,0 +1,55 @@
+/**
+ * ACF Integration Styles
+ * Styles for AI Edit buttons in ACF flexible content rows
+ */
+
+/* AI Edit button in ACF row header */
+.cae-acf-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    margin-left: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+    opacity: 0.9;
+}
+
+.cae-acf-edit-btn:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.cae-acf-edit-btn:active {
+    transform: translateY(0);
+}
+
+.cae-acf-edit-btn svg {
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Highlighted ACF row when selected */
+.acf-flexible-content .layout.cae-acf-selected {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.acf-flexible-content .layout.cae-acf-selected .acf-fc-layout-handle {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+/* Make sure button is visible in collapsed rows */
+.acf-flexible-content .layout.-collapsed .cae-acf-edit-btn {
+    display: inline-flex;
+}
+
