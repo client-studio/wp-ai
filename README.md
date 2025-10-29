@@ -1,4 +1,4 @@
-# WordPress AI Editor
+# WordPress AI Editor (beta)
 
 A WordPress plugin that provides AI-powered content editing capabilities directly in the WordPress block editor.
 
@@ -36,12 +36,6 @@ Once activated and configured, the AI chat widget will appear in the WordPress b
 2. Type your editing request in the chat
 3. Review the proposed changes in the diff viewer
 4. Apply or discard changes as needed
-
-## Requirements
-
-- WordPress 5.8 or higher
-- PHP 7.4 or higher
-- OpenAI API key or compatible AI service
 
 ## Development
 
