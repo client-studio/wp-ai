@@ -36,13 +36,19 @@ export function DiffModal( { changes, currentData, postId, onClose, onApply } ) 
 					'div',
 					{ className: 'cae-diff-side cae-diff-old' },
 					createElement( 'div', { className: 'cae-diff-side-label' }, 'Before' ),
-					createElement( 'div', { className: 'cae-diff-side-content' }, oldValue || '(empty)' )
+					createElement( 'div', { 
+						className: 'cae-diff-side-content',
+						dangerouslySetInnerHTML: { __html: oldValue || '<em>(empty)</em>' }
+					})
 				),
 				createElement(
 					'div',
 					{ className: 'cae-diff-side cae-diff-new' },
 					createElement( 'div', { className: 'cae-diff-side-label' }, 'After (AI)' ),
-					createElement( 'div', { className: 'cae-diff-side-content' }, newValue || '(empty)' )
+					createElement( 'div', { 
+						className: 'cae-diff-side-content',
+						dangerouslySetInnerHTML: { __html: newValue || '<em>(empty)</em>' }
+					})
 				)
 			)
 		);

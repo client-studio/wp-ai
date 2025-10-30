@@ -129,7 +129,8 @@ function cae_build_streaming_system_prompt($block_context, $post_id, $language =
     $prompt .= "INSTRUCTIONS:\n";
     $prompt .= "1. When editing content, use this EXACT format:\n";
     $prompt .= "   First, write a brief conversational message describing what you changed.\n";
-    $prompt .= "   Then, on a new line, provide the JSON changes:\n";
+    $prompt .= "   IMPORTANT: Do NOT repeat or show the field content in your message! Only describe the changes.\n";
+    $prompt .= "   Then, on a new line, provide ONLY the JSON changes:\n";
     
     if (!$block_context && $modules) {
         // Full page mode - different JSON format
@@ -152,9 +153,10 @@ function cae_build_streaming_system_prompt($block_context, $post_id, $language =
     $prompt .= "2. Only modify text fields. Preserve HTML tags if present.\n";
     $prompt .= "3. For questions or confirmations (no edits), respond naturally without JSON.\n";
     $prompt .= "4. Be helpful, concise, and professional.\n";
+    $prompt .= "5. NEVER echo back the raw field content or HTML in your message. Only describe what you changed.\n";
     
     if ($language && $language_name) {
-        $prompt .= "5. CRITICAL: Keep all content in " . $language_name . " language!\n";
+        $prompt .= "6. CRITICAL: Keep all content in " . $language_name . " language!\n";
     }
     
     return $prompt;

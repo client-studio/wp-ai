@@ -147,12 +147,70 @@
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  padding: 10px;
-  font-size: 13px;
+  padding: 12px;
+  font-size: 14px;
   line-height: 1.6;
   min-height: 60px;
-  white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* Rendered HTML styles */
+.cae-diff-side-content h1,
+.cae-diff-side-content h2,
+.cae-diff-side-content h3,
+.cae-diff-side-content h4,
+.cae-diff-side-content h5,
+.cae-diff-side-content h6 {
+  margin: 0 0 0.5em 0;
+  font-weight: 600;
+  line-height: 1.3;
+  color: inherit;
+}
+
+.cae-diff-side-content h1 { font-size: 1.8em; }
+.cae-diff-side-content h2 { font-size: 1.5em; }
+.cae-diff-side-content h3 { font-size: 1.3em; }
+.cae-diff-side-content h4 { font-size: 1.1em; }
+.cae-diff-side-content h5 { font-size: 1em; }
+.cae-diff-side-content h6 { font-size: 0.9em; }
+
+.cae-diff-side-content p {
+  margin: 0 0 1em 0;
+}
+
+.cae-diff-side-content p:last-child {
+  margin-bottom: 0;
+}
+
+.cae-diff-side-content ul,
+.cae-diff-side-content ol {
+  margin: 0 0 1em 0;
+  padding-left: 1.5em;
+}
+
+.cae-diff-side-content li {
+  margin: 0.25em 0;
+}
+
+.cae-diff-side-content em {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.cae-diff-side-content strong {
+  font-weight: 600;
+}
+
+.cae-diff-side-content a {
+  color: #667eea;
+  text-decoration: underline;
+}
+
+.cae-diff-side-content blockquote {
+  margin: 1em 0;
+  padding-left: 1em;
+  border-left: 3px solid #e2e8f0;
+  color: #64748b;
 }
 
 .cae-diff-old .cae-diff-side-content {
