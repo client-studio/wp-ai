@@ -52,6 +52,8 @@
                 const blockIndex = $(this).data('block-index');
                 const layout = $(this).data('layout');
                 
+                console.log('CAE: Button clicked - Index:', blockIndex, 'Layout:', layout, 'Post ID:', CAE_Data.postId);
+                
                 // Trigger custom event that React can listen to
                 const event = new CustomEvent('cae:selectBlock', {
                     detail: {
