@@ -3,7 +3,7 @@
  * Plugin Name: Client AI Block Editor
  * Plugin URI: https://example.com
  * Description: AI Block Editor v2 - React + AI SDK streaming chat for ACF flexible content
- * Version: 2.0.0
+ * Version: 2.0.1
  * Author: Your Name
  * Author URI: https://example.com
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CAE_VERSION', '2.0.0');
+define('CAE_VERSION', '2.0.1');
 define('CAE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('CAE_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CAE_PLUGIN_BASENAME', plugin_basename(__FILE__));
