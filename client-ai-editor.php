@@ -215,11 +215,24 @@ class Client_AI_Editor {
             }
         }
         
+        // Get post ID (works in both admin and frontend)
+        $post_id = get_the_ID();
+        
+        // In admin, try to get post ID from query string if get_the_ID() fails
+        if (is_admin() && !$post_id) {
+            global $post;
+            if ($post && isset($post->ID)) {
+                $post_id = $post->ID;
+            } elseif (isset($_GET['post'])) {
+                $post_id = intval($_GET['post']);
+            }
+        }
+        
         // Localize script with data for React
         wp_localize_script('cae-app', 'CAE_Data', [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('cae-nonce'),
-            'postId' => get_the_ID(),
+            'postId' => $post_id,
             'mode' => is_admin() ? 'admin' : 'frontend',
             'language' => $current_language,
             'languageName' => $language_name,

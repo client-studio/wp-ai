@@ -22,6 +22,8 @@ function cae_ajax_get_block() {
     $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
     $block_index = isset($_POST['block_index']) ? intval($_POST['block_index']) : 0;
     
+    error_log('CAE get_block: post_id=' . $post_id . ', block_index=' . $block_index);
+    
     if (!$post_id) {
         wp_send_json_error(['message' => 'Invalid post ID']);
     }
@@ -29,15 +31,21 @@ function cae_ajax_get_block() {
     // Get modules field
     $modules = get_field('modules', $post_id);
     
+    error_log('CAE get_block: modules=' . (is_array($modules) ? count($modules) : 'null'));
+    
     if (!$modules || !isset($modules[$block_index])) {
-        wp_send_json_error(['message' => 'Block not found']);
+        wp_send_json_error(['message' => 'Block not found at index ' . $block_index]);
     }
     
     $block = $modules[$block_index];
-    $layout = $block['acf_fc_layout'];
+    $layout = isset($block['acf_fc_layout']) ? $block['acf_fc_layout'] : 'unknown';
+    
+    error_log('CAE get_block: layout=' . $layout);
     
     // Filter to text fields only
     $text_fields = cae_filter_text_fields($block);
+    
+    error_log('CAE get_block: text_fields=' . json_encode($text_fields));
     
     wp_send_json_success([
         'layout' => $layout,
