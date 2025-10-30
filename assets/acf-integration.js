@@ -8,8 +8,15 @@
      * Add AI edit button to each ACF flexible content row
      */
     function addAIButtonsToACFRows() {
-        // Find all ACF flexible content rows
-        $('.acf-flexible-content .layout').each(function(index) {
+        // Find the "modules" flexible content field specifically
+        const $modulesField = $('.acf-field[data-name="modules"] .acf-flexible-content');
+        
+        if ($modulesField.length === 0) {
+            return;
+        }
+        
+        // Find all rows within the modules field
+        $modulesField.find('.layout').each(function(index) {
             const $row = $(this);
             const $handle = $row.find('.acf-fc-layout-handle').first();
             
@@ -95,10 +102,10 @@
                 });
             });
             
-            // Observe the flexible content container
-            const flexibleContent = document.querySelector('.acf-flexible-content');
-            if (flexibleContent) {
-                observer.observe(flexibleContent, {
+            // Observe the modules flexible content container specifically
+            const modulesField = document.querySelector('.acf-field[data-name="modules"] .acf-flexible-content');
+            if (modulesField) {
+                observer.observe(modulesField, {
                     childList: true,
                     subtree: true
                 });
